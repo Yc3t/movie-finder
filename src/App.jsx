@@ -1,22 +1,28 @@
 import './App.css'
-import { useRef} from 'react'
+import { useState} from 'react'
 import { Movies } from './components/Movies'
 import { useMovies } from './hooks/useMovies'
 import { useSearch } from './hooks/useSearch'
 
 
 function App() {
-  const { movies } = useMovies()
-  const inputRef = useRef()
   const { search, updateSearch, error } = useSearch()
 
+
+  const [sort, setSort] = useState(false)
+
+  const { movies, getMovies,loading } = useMovies({search,sort})
   const handleSubmit = (event) => {
     event.preventDefault()
-    console.log({ search })
+    getMovies()
   }
 
   const handleChange = (event) => {
     updateSearch(event.target.value)
+
+  }
+  const handleSort=() =>{
+    setSort(!sort)
 
   }
 
@@ -29,7 +35,10 @@ function App() {
 
           <form onSubmit={handleSubmit} className="form1">
 
-            <input onChange={handleChange} value={search} name='query' ref={inputRef} placeholder="Batman,Star Wars..." />
+            <input onChange={handleChange} value={search} name='query' placeholder="Batman,Star Wars..." />
+
+            <input type='checkbox' onChange={handleSort} checked={sort}/>
+            
 
             <button>Search</button>
 
@@ -38,7 +47,7 @@ function App() {
           {error && <p style={{ color: 'red' }}>{error}</p>}
         </header>
         <main>
-          <Movies movies={movies} />
+          {loading ? <p>loading...</p> : <Movies movies={movies} />}
         </main>
       </div>
     </>
